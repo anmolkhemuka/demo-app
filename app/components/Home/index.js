@@ -1,13 +1,28 @@
 import React, { Component,useState} from 'react';
 import {StyleSheet,View,Image,Pressable, Button,Text,TouchableOpacity} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import {
+  ApolloProvider,  ApolloClient,  createHttpLink,  InMemoryCache,gql,useQuery} from '@apollo/client';
+import App from '../../../App';
 
+ 
 export function Home({ navigation }) {
+  const get_name = gql`
+  {
+    person{
+      name
+      bio
+
+    }
+  }
+  `;
+  const {loading,error,  data } = useQuery(get_name);
   const [imageSource, setImageSource] = useState(null);
 
+  if (loading) return <Text>loading</Text>;
+  if (error) return <Text>`Error! ${error.message}`</Text>;
   return (
+    
     <View style={{ flex: 1, backgroundColor:'#E0EEEE' }}>
       <Pressable onLongPress={()=>{
         const options = {
@@ -69,6 +84,8 @@ export function Home({ navigation }) {
         <Text style={{fontSize:40,textAlign:'center',justifyContent:'center',color:'#ffff00'}}>+</Text>
     </TouchableOpacity>
     </View>
+    <Text style={styles.text}>{data["person"].name}</Text>
+    <Text style={styles.text}>{data["person"].bio}</Text>
      </View>
   );
 }
@@ -100,5 +117,12 @@ const styles = StyleSheet.create({
       height:30,
       backgroundColor:'#33cccc',
       borderRadius:40   
+    },
+    text:{
+      fontSize : 30,
+      textAlign:'center',
+      justifyContent: 'center'
+
+
     },
   });
